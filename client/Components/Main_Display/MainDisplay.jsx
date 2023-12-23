@@ -65,7 +65,7 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
     let currClipNum = clipNum;
     setClipNum((prev) => prev + 1);
     axios
-      .post(modelUrl, { name: `clip${currClipNum}` })
+      .post(modelUrl, { name: `clip${currClipNum}.mp4` })
       .then((response) => {
         console.log("Response:", response.data);
       })
@@ -78,7 +78,7 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
     stopRecording();
     console.log("recording stopped!");
     console.log("send is ", send);
-    // notifyModel();
+    notifyModel();
     // if (send && st < 10) {
     //   clearTimeout(timeoutId);
     //   console.log("status: ", st);
