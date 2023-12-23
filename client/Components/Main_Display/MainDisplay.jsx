@@ -60,7 +60,7 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   let st = 1;
   const notifyModel = () => {
     let currClipNum = clipNum;
-    setClipNum((prev) => prev + 1);
+    setClipNum((prev) => prev);
     axios
       .post(modelUrl, { name: `clip${currClipNum}.mp4` })
       .then((response) => {
