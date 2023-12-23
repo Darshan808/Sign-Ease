@@ -13,27 +13,27 @@ const InfoBox = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   const [activeDots, setActiveDots] = useState([]);
   const [intervalId, setIntervalId] = useState(null);
 
-  const addGreenDots = () => {
-    for (let i = 0; i < 4; i++) {
-      setTimeout((i) => {
-        if (i == 0) {
-          setActiveDots([]);
-        }
-        setActiveDots((prev) => [...prev, "."]);
-      }, 1000);
-    }
-  };
+  // const addGreenDots = () => {
+  //   for (let i = 0; i < 4; i++) {
+  //     setTimeout((i) => {
+  //       if (i == 0) {
+  //         setActiveDots([]);
+  //       }
+  //       setActiveDots((prev) => [...prev, "."]);
+  //     }, 1000);
+  //   }
+  // };
 
-  if (isVideoOn && intervalId == null) {
-    addGreenDots();
-    let myintervalId = setInterval(addGreenDots, 5000);
-    setIntervalId(myintervalId);
-  }
+  // if (isVideoOn && intervalId == null) {
+  //   addGreenDots();
+  //   let myintervalId = setInterval(addGreenDots, 5000);
+  //   setIntervalId(myintervalId);
+  // }
 
-  if (!isVideoOn && intervalId) {
-    clearInterval(intervalId);
-    setIntervalId(null);
-  }
+  // if (!isVideoOn && intervalId) {
+  //   clearInterval(intervalId);
+  //   setIntervalId(null);
+  // }
 
   const handleSumbit = (e) => {
     e.preventDefault();
