@@ -11,11 +11,10 @@ import { useReactMediaRecorder } from "react-media-recorder";
 import { useNavigate } from "react-router-dom";
 
 const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
-  const [text, setText] = useState([]);
+  const [text, setText] = useState(["You:"]);
   const [myStream, setMyStream] = useState(null);
   const [clipNum, setClipNum] = useState(1);
   const modelUrl = "http://localhost:5000/api/translate";
-  const [send, setSend] = useState(true);
   const navigate = useNavigate();
 
   const downloadVideo = (blobUrl, fileName) => {
@@ -28,9 +27,11 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
     document.body.removeChild(a);
   };
 
+  let it;
   const handleUrl = (blobUrl) => {
     console.log("handling url");
-    downloadVideo(blobUrl, `clip${clipNum}`);
+    downloadVideo(blobUrl, `clip${it}`);
+    it += 1;
     console.log(blobUrl);
   };
 
@@ -41,32 +42,23 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
       onStop: (blobUrl) => handleUrl(blobUrl),
     });
 
-  // const showText = () => {
-  //   for (let i = 0; i < displayText.length; i++) {
-  //     setTimeout(() => {
-  //       setText((prevText) => [...prevText, displayText[i]]);
-  //     }, (i + 1) * 100);
-  //   }
-  // };
-
   const setStream = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
     });
     setMyStream(stream);
   };
-
-  let timeoutId = null;
-  let st = 1;
-  const notifyModel = () => {
-    let currClipNum = clipNum;
-    setClipNum((prev) => prev);
+  const notifyModel = (clipNumIt) => {
+    // let currClipNum = clipNum;
+    setClipNum((prev) => prev + 1);
+    console.log("Response", clipNumIt);
+    console.log(`Saved in clip${clipNumIt}.mp4`);
     axios
-      .post(modelUrl, { name: `clip${currClipNum}.mp4` })
+      .post(modelUrl, { name: `clip${clipNumIt}.mp4` })
       .then((response) => {
         console.log("Response:", response.data);
         if (text.length == 0) {
-          setText((prev) => [...prev, "YOU:", response.data.translation]);
+          setText((prev) => [...prev, response.data.translation]);
         } else {
           setText((prev) => [...prev, response.data.translation]);
         }
@@ -77,15 +69,20 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   };
 
   const [intervalId, setIntervalId] = useState(null);
+  const [intervalId2, setIntervalId2] = useState(null);
 
-  const startSendingRecordings = () => {
+  async function startSendingRecordings() {
     startRecording();
     console.log("Recording Started!");
-    timeoutId = setTimeout(() => {
-      stopRecording();
-      notifyModel();
-    }, 4000);
-  };
+    await new Promise((resolve) =>
+      setTimeout(() => {
+        stopRecording();
+        notifyModel();
+        resolve("done");
+      }, 4000)
+    );
+    console.log("Recording Finished!");
+  }
 
   const deleteClips = () => {
     axios
@@ -97,14 +94,14 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
         console.error("Error:", error.message);
       });
   };
-  let i = 1;
-  const testingFunc = () => {
-    console.log(i);
-    setTimeout(() => {
-      console.log("stopped");
-    }, 4000);
-    i += 1;
-  };
+  // let i = 1;
+  // const testingFunc = () => {
+  //   console.log(i);
+  //   setTimeout(() => {
+  //     console.log("stopped");
+  //   }, 4000);
+  //   i += 1;
+  // };
   const handleMV = async (type) => {
     if (type == "mic") {
       setIsMicOn((prev) => !prev);
@@ -112,17 +109,37 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
       if (!isVideoOn) {
         deleteClips();
         setStream();
-        // let myintervalId = setInterval(startSendingRecordings, 4000);
-        // setIntervalId(myintervalId);
-        startSendingRecordings();
+        // let myintervalId = setInterval(() => {
+        //   startSendingRecordings().catch((error) => {
+        //     console.error("Error in startSendingRecordings:", error);
+        //   });
+        // }, 4000);
+        let myintervalId = setInterval(() => {
+          startRecording();
+          console.log("started");
+        }, 5000);
+        clearInterval(intervalId);
+        setIntervalId(myintervalId);
+        it = 1;
+        setTimeout(() => {
+          let myintervalId2 = setInterval(() => {
+            stopRecording();
+            console.log("stopped");
+            notifyModel(it);
+            clearInterval(intervalId2);
+            setIntervalId2(myintervalId2);
+          }, 5000);
+        }, 3000);
+        // startSendingRecordings();
       } else {
         setMyStream(null);
-        // clearInterval(intervalId);
+        clearInterval(intervalId);
+        clearInterval(intervalId2);
         setIntervalId(null);
-        console.log("set send to ", send);
+        setIntervalId2(null);
+        // clearTimeout(timeoutId);
+        // setTimeoutId(null);
         setClipNum(1);
-        st = 10;
-        clearTimeout(timeoutId);
         stopRecording();
         await myStream.getTracks().forEach((track) => track.stop());
       }

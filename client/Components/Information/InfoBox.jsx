@@ -13,16 +13,16 @@ const InfoBox = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   const [activeDots, setActiveDots] = useState([]);
   const [intervalId, setIntervalId] = useState(null);
 
-  const addGreenDots = () => {
-    for (let i = 0; i < 4; i++) {
-      setTimeout((i) => {
-        if (i == 0) {
-          setActiveDots([]);
-        }
-        setActiveDots((prev) => [...prev, "."]);
-      }, 1000);
-    }
-  };
+  // const addGreenDots = () => {
+  //   for (let i = 0; i < 4; i++) {
+  //     setTimeout((i) => {
+  //       if (i == 0) {
+  //         setActiveDots([]);
+  //       }
+  //       setActiveDots((prev) => [...prev, "."]);
+  //     }, 1000);
+  //   }
+  // };
 
   // if (isVideoOn && intervalId == null) {
   //   addGreenDots();

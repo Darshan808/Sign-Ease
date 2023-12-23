@@ -12,7 +12,8 @@ from flask_cors import CORS, cross_origin
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+
 
 class HandSignRecognizer:
     def __init__(self):
@@ -156,37 +157,39 @@ def delete_all_files(directory):
 
 
 @app.route('/api')
-@cross_origin()
 def check():
     return "Api Running Successfully!"
 
 
 @app.route('/api/translate', methods=['POST'])
-@cross_origin()
 def translateMethod():
     if request.is_json:
         data = request.get_json()
         if data["name"]:
             start_time = time.time()
             urlPrefix = r"..\clips\\"
-            # clipName = "413016827_398696755922665_6024204951804170333_n.mp4"
-            clipName = data["name"]
-            clipName = "clip1.mp4"
+            hn = -1
+            for filename in os.listdir('../clips'):
+                hn = max(int(filename[4]), hn)
+            clipName = f'clip{hn}.mp4'
+            # clipName = data["name"]
+            print("predicting " + clipName)
             word, c = recognizer.vid_to_eng(urlPrefix+clipName)
             end_time = time.time()
             print(
                 f'Predicted {word} with confidence {c} in {end_time-start_time} seconds.')
-            return jsonify({"translation": word})
+            response = jsonify({"translation": word})
+            return response
         else:
-            return jsonify({"message": "Error"})
+            response = jsonify({"message": "Error"})
+            return response
 
     else:
-        return jsonify({'error': 'Invalid JSON'}), 400
-
+        response = jsonify({'error': 'Invalid JSON'}), 400
+        return response
 
 
 @app.route('/api/deleteClips', methods=['DELETE'])
-@cross_origin()
 def delete_all_files():
     directory = r"D:\MachineLearning\IPL_Dataset(main_env)\New folder\asl-handsigns\Sign-Ease\clips"
     for filename in os.listdir(directory):
