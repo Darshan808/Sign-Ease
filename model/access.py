@@ -131,7 +131,7 @@ class HandSignRecognizer:
         
         xyz_npp = self.load_relevant_data_subset(landmarks)
         sign, confidence = self.predict(xyz_npp)
-        if confidence > 4:
+        if confidence > 3:
             return sign , confidence
         return "", confidence
     
@@ -139,7 +139,7 @@ class HandSignRecognizer:
 
 recognizer = HandSignRecognizer()
 
-video_path = r"me_demo.mp4"
+video_path = r"D:\MachineLearning\IPL_Dataset(main_env)\New folder\asl-handsigns\Sign-Ease\data\clips\gyanu.mp4"
 start_time = time.time()
 s,a = recognizer.vid_to_eng(video_path)
 print(s)
