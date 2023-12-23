@@ -53,36 +53,25 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
     setClipNum((prev) => prev + 1);
     console.log("Response", clipNumIt);
     console.log(`Saved in clip${clipNumIt}.mp4`);
-    axios
-      .post(modelUrl, { name: `clip${clipNumIt}.mp4` })
-      .then((response) => {
-        console.log("Response:", response.data);
-        if (text.length == 0) {
-          setText((prev) => [...prev, response.data.translation]);
-        } else {
-          setText((prev) => [...prev, response.data.translation]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error.message);
-      });
+    setTimeout(() => {
+      axios
+        .post(modelUrl, { name: `clip${clipNumIt}.mp4` })
+        .then((response) => {
+          console.log("Response:", response.data);
+          if (text.length == 0) {
+            setText((prev) => [...prev, response.data.translation]);
+          } else {
+            setText((prev) => [...prev, response.data.translation]);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error.message);
+        });
+    }, 300);
   };
 
   const [intervalId, setIntervalId] = useState(null);
   const [intervalId2, setIntervalId2] = useState(null);
-
-  async function startSendingRecordings() {
-    startRecording();
-    console.log("Recording Started!");
-    await new Promise((resolve) =>
-      setTimeout(() => {
-        stopRecording();
-        notifyModel();
-        resolve("done");
-      }, 4000)
-    );
-    console.log("Recording Finished!");
-  }
 
   const deleteClips = () => {
     axios
@@ -116,6 +105,11 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
         // }, 4000);
         let myintervalId = setInterval(() => {
           startRecording();
+          document.querySelector(".fiveDots").innerHTML =
+            '<div id="activeDot" style="top: -53px; left: -10px;">.</div>';
+          setTimeout(() => {
+            document.querySelector(".fiveDots").innerHTML = "";
+          }, 500);
           console.log("started");
         }, 5000);
         clearInterval(intervalId);

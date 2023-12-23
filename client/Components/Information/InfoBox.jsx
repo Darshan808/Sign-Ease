@@ -59,24 +59,7 @@ const InfoBox = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
             <div className="p-iname">
               <img src={Avatar} />
               <span>You</span>
-              <div className="fiveDots">
-                {activeDots.map((dot, index) => {
-                  let leftPush = -14 + 10 * index;
-                  return (
-                    <div
-                      style={{
-                        top: "-52px",
-                        left: `${leftPush}px`,
-                        fontSize: "3.5rem",
-                      }}
-                      className="activeDot"
-                      key={index}
-                    >
-                      {dot}
-                    </div>
-                  );
-                })}
-              </div>
+              <div className="fiveDots"></div>
             </div>
             <div className="i-icons">
               <img src={isMicOn ? Mic : Mute_Mic} />
