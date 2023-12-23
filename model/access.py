@@ -21,7 +21,7 @@ class HandSignRecognizer:
         self.ROWS_PER_FRAME = 543
         self.count = 0
         self.face = pd.DataFrame()
-        self.frame_skip = 10
+        self.frame_skip = 5
         xyz = pd.read_csv("xyz_df.csv")
         self.xyz_skel = xyz[['type', 'landmark_index']
                             ].drop_duplicates().reset_index(drop=True).copy()
@@ -141,7 +141,7 @@ class HandSignRecognizer:
         xyz_npp = self.load_relevant_data_subset(landmarks)
         sign, confidence = self.predict(xyz_npp)
         if confidence > 0:
-            return sign, confidence
+            return sign + str(confidence), confidence
         return "", confidence
 
 
@@ -176,7 +176,7 @@ def translateMethod():
             end_time = time.time()
             print(
                 f'Predicted {word} with confidence {c} in {end_time-start_time} seconds.')
-            return jsonify({"translation": word + str(c)})
+            return jsonify({"translation": word})
         else:
             return jsonify({"message": "Error"})
 

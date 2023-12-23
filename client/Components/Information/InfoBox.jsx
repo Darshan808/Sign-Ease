@@ -24,16 +24,16 @@ const InfoBox = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
     }
   };
 
-  if (isVideoOn && intervalId == null) {
-    addGreenDots();
-    let myintervalId = setInterval(addGreenDots, 5000);
-    setIntervalId(myintervalId);
-  }
+  // if (isVideoOn && intervalId == null) {
+  //   addGreenDots();
+  //   let myintervalId = setInterval(addGreenDots, 5000);
+  //   setIntervalId(myintervalId);
+  // }
 
-  if (!isVideoOn && intervalId) {
-    clearInterval(intervalId);
-    setIntervalId(null);
-  }
+  // if (!isVideoOn && intervalId) {
+  //   clearInterval(intervalId);
+  //   setIntervalId(null);
+  // }
 
   const handleSumbit = (e) => {
     e.preventDefault();

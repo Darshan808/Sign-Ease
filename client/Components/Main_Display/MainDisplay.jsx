@@ -112,11 +112,12 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
       if (!isVideoOn) {
         deleteClips();
         setStream();
-        let myintervalId = setInterval(startSendingRecordings, 4000);
-        setIntervalId(myintervalId);
+        // let myintervalId = setInterval(startSendingRecordings, 4000);
+        // setIntervalId(myintervalId);
+        startSendingRecordings();
       } else {
         setMyStream(null);
-        clearInterval(intervalId);
+        // clearInterval(intervalId);
         setIntervalId(null);
         console.log("set send to ", send);
         setClipNum(1);
