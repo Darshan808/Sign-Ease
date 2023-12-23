@@ -8,6 +8,7 @@ import mediapipe as mp
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -141,6 +142,16 @@ class HandSignRecognizer:
         return "", confidence
 
 
+def delete_all_files(directory):
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(f"Error deleting {file_path}: {e}")
+
+
 @app.route('/api')
 @cross_origin()
 def check():
@@ -155,7 +166,8 @@ def translateMethod():
         if data["name"]:
             start_time = time.time()
             urlPrefix = r"..\clips\\"
-            clipName = data["name"]
+            clipName = "413016827_398696755922665_6024204951804170333_n.mp4"
+            # clipName = data["name"]
             word, c = recognizer.vid_to_eng(urlPrefix+clipName)
             end_time = time.time()
             print(
@@ -174,11 +186,25 @@ def translateMethod():
         return response
 
 
+@app.route('/api/deleteClips', methods=['DELETE'])
+@cross_origin()
+def delete_all_files():
+    directory = r"C:\Users\Darshan\Desktop\Sign_Ease\clips"
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(f"Error deleting {file_path}: {e}")
+    return jsonify({"message": "done"})
+
+
 if __name__ == '__main__':
     recognizer = HandSignRecognizer()
     print("Api Running")
     app.run(debug=True)
     # urlPrefix = r"..\clips\\"
-    # clipName = "grandma.mp4"
+    # clipName = "dad.mp4"
     # word, c = recognizer.vid_to_eng(urlPrefix+clipName)
-    # print(word)
+    # print(word, c)
