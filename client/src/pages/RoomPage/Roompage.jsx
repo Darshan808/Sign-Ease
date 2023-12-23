@@ -8,6 +8,7 @@ import InfoBox from "../../../Components/Information/InfoBox";
 const Roompage = () => {
   const [isMicOn, setIsMicOn] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
+  
   return (
     <div className="main-wrapper">
       <div className="content-wrapper">

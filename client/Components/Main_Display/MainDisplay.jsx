@@ -15,7 +15,7 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   const [myStream, setMyStream] = useState(null);
   const [clipNum, setClipNum] = useState(1);
   const modelUrl = "http://localhost:5000/api/translate";
-  let send = true;
+  const [send, setSend] = useState(true);
   const navigate = useNavigate();
 
   const downloadVideo = (blobUrl, fileName) => {
@@ -41,9 +41,6 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
       onStop: (blobUrl) => handleUrl(blobUrl),
     });
 
-  const displayStr =
-    "Josh: Hello Everyone.SignEase is a game-changer! The seamless real-time translation of handsigns into captions makes communication effortless and inclusive, revolutionizing accessibility for the hearing-impaired.";
-  const displayText = displayStr.split(" ");
   const showText = () => {
     for (let i = 0; i < displayText.length; i++) {
       setTimeout(() => {
@@ -68,6 +65,7 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
       .post(modelUrl, { name: `clip${currClipNum}.mp4` })
       .then((response) => {
         console.log("Response:", response.data);
+        setText((prev) => [...prev, response.data.translation]);
       })
       .catch((error) => {
         console.error("Error:", error.message);
@@ -77,14 +75,13 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   const stopSendingRecordings = () => {
     stopRecording();
     console.log("recording stopped!");
-    console.log("send is ", send);
     notifyModel();
-    // if (send && st < 10) {
-    //   clearTimeout(timeoutId);
-    //   console.log("status: ", st);
-    //   st += 1;
-    //   startSendingRecordings();
-    // }
+    if (isVideoOn) {
+      clearTimeout(timeoutId);
+      console.log("status: ", st);
+      st += 1;
+      startSendingRecordings();
+    }
   };
 
   const startSendingRecordings = () => {
@@ -95,18 +92,27 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
     }, 4000);
   };
 
+  const deleteClips = () => {
+    axios
+      .delete("http://localhost:5000/api/deleteClips")
+      .then((response) => {
+        console.log("Response:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error.message);
+      });
+  };
+
   const handleMV = async (type) => {
     if (type == "mic") {
-      isMicOn && showText();
       setIsMicOn((prev) => !prev);
     } else if (type == "video") {
       if (!isVideoOn) {
-        send = true;
         startSendingRecordings();
         setStream();
       } else {
         setMyStream(null);
-        send = false;
+        deleteClips();
         console.log("set send to ", send);
         st = 10;
         clearTimeout(timeoutId);
