@@ -41,13 +41,13 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
       onStop: (blobUrl) => handleUrl(blobUrl),
     });
 
-  const showText = () => {
-    for (let i = 0; i < displayText.length; i++) {
-      setTimeout(() => {
-        setText((prevText) => [...prevText, displayText[i]]);
-      }, (i + 1) * 100);
-    }
-  };
+  // const showText = () => {
+  //   for (let i = 0; i < displayText.length; i++) {
+  //     setTimeout(() => {
+  //       setText((prevText) => [...prevText, displayText[i]]);
+  //     }, (i + 1) * 100);
+  //   }
+  // };
 
   const setStream = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -65,30 +65,25 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
       .post(modelUrl, { name: `clip${currClipNum}.mp4` })
       .then((response) => {
         console.log("Response:", response.data);
-        setText((prev) => [...prev, response.data.translation]);
+        if (text.length == 0) {
+          setText((prev) => [...prev, "YOU:", response.data.translation]);
+        } else {
+          setText((prev) => [...prev, response.data.translation]);
+        }
       })
       .catch((error) => {
         console.error("Error:", error.message);
       });
   };
 
-  const stopSendingRecordings = () => {
-    stopRecording();
-    console.log("recording stopped!");
-    notifyModel();
-    if (isVideoOn) {
-      clearTimeout(timeoutId);
-      console.log("status: ", st);
-      st += 1;
-      startSendingRecordings();
-    }
-  };
+  const [intervalId, setIntervalId] = useState(null);
 
   const startSendingRecordings = () => {
     startRecording();
     console.log("Recording Started!");
     timeoutId = setTimeout(() => {
-      stopSendingRecordings();
+      stopRecording();
+      notifyModel();
     }, 4000);
   };
 
@@ -102,18 +97,29 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
         console.error("Error:", error.message);
       });
   };
-
+  let i = 1;
+  const testingFunc = () => {
+    console.log(i);
+    setTimeout(() => {
+      console.log("stopped");
+    }, 4000);
+    i += 1;
+  };
   const handleMV = async (type) => {
     if (type == "mic") {
       setIsMicOn((prev) => !prev);
     } else if (type == "video") {
       if (!isVideoOn) {
-        startSendingRecordings();
+        deleteClips();
         setStream();
+        let myintervalId = setInterval(startSendingRecordings, 4000);
+        setIntervalId(myintervalId);
       } else {
         setMyStream(null);
-        deleteClips();
+        clearInterval(intervalId);
+        setIntervalId(null);
         console.log("set send to ", send);
+        setClipNum(1);
         st = 10;
         clearTimeout(timeoutId);
         stopRecording();
