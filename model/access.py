@@ -9,6 +9,7 @@ import mediapipe as mp
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -18,8 +19,9 @@ class HandSignRecognizer:
 
         self.mp_holistic = mp.solutions.holistic
         self.ROWS_PER_FRAME = 543
+        self.count = 0
         self.face = pd.DataFrame()
-        self.frame_skip = 8
+        self.frame_skip = 10
         xyz = pd.read_csv("xyz_df.csv")
         self.xyz_skel = xyz[['type', 'landmark_index']
                             ].drop_duplicates().reset_index(drop=True).copy()
@@ -34,13 +36,14 @@ class HandSignRecognizer:
         self.n2sign = {value: key for key, value in json_data.items()}
 
     def create_frame_landmark_df(self, results, frame):
-
+        print(frame)
         pose = pd.DataFrame()
         left_hand = pd.DataFrame()
         right_hand = pd.DataFrame()
-
-        if (frame/self.frame_skip) < 2:
-
+        self.count+=1
+        #if ((self.count % 4) == 0) or  (frame/self.frame_skip)==1:
+        if (frame/self.frame_skip)==1:
+            self.face = pd.DataFrame()
             if results.face_landmarks is not None:
                 for i, point in enumerate(results.face_landmarks.landmark):
                     self.face.loc[i, 'x'] = point.x
@@ -99,7 +102,7 @@ class HandSignRecognizer:
         with self.mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
             frame = 0
             while cap.isOpened():
-
+                
                 frame += 1
                 success, image = cap.read()
                 if not success:
@@ -118,6 +121,7 @@ class HandSignRecognizer:
                     all_landmarks.append(landmarks_df)
 
         self.face = pd.DataFrame()
+        self.count = 0
         cap.release()
         all_landmarks_df = pd.concat(all_landmarks).reset_index(drop=True)
         return all_landmarks_df
@@ -141,6 +145,16 @@ class HandSignRecognizer:
         return "", confidence
 
 
+def delete_all_files(directory):
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(f"Error deleting {file_path}: {e}")
+
+
 @app.route('/api')
 @cross_origin()
 def check():
@@ -155,13 +169,14 @@ def translateMethod():
         if data["name"]:
             start_time = time.time()
             urlPrefix = r"..\clips\\"
-            # clipName = data["name"]
+            # clipName = "413016827_398696755922665_6024204951804170333_n.mp4"
+            clipName = data["name"]
             clipName = "clip1.mp4"
             word, c = recognizer.vid_to_eng(urlPrefix+clipName)
             end_time = time.time()
             print(
                 f'Predicted {word} with confidence {c} in {end_time-start_time} seconds.')
-            return jsonify({"translation": word})
+            return jsonify({"translation": word + str(c)})
         else:
             return jsonify({"message": "Error"})
 
@@ -170,12 +185,26 @@ def translateMethod():
 
 
 
+@app.route('/api/deleteClips', methods=['DELETE'])
+@cross_origin()
+def delete_all_files():
+    directory = r"D:\MachineLearning\IPL_Dataset(main_env)\New folder\asl-handsigns\Sign-Ease\clips"
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(f"Error deleting {file_path}: {e}")
+    return jsonify({"message": "done"})
+
+
 if __name__ == '__main__':
     
     recognizer = HandSignRecognizer()
     print("Api Running")
     app.run(debug=True)
     # urlPrefix = r"..\clips\\"
-    # clipName = "clip1.mp4"
+    # clipName = "dad.mp4"
     # word, c = recognizer.vid_to_eng(urlPrefix+clipName)
-    # print(word)
+    # print(word, c)
