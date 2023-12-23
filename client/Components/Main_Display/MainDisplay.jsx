@@ -4,6 +4,7 @@ import Video from "../../Assets/zoom.png";
 import Call from "../../Assets/phone.png";
 import Mute_Mic from "../../Assets/mute-microphone.png";
 import No_Video from "../../Assets/no-video.png";
+import axios from "axios";
 import { useState } from "react";
 import ReactPlayer from "react-player";
 import { useReactMediaRecorder } from "react-media-recorder";
@@ -13,6 +14,7 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   const [text, setText] = useState([]);
   const [myStream, setMyStream] = useState(null);
   const [clipNum, setClipNum] = useState(1);
+  const modelUrl = "http://localhost:5000/api/translate";
   let send = true;
   const navigate = useNavigate();
 
@@ -29,7 +31,6 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   const handleUrl = (blobUrl) => {
     console.log("handling url");
     downloadVideo(blobUrl, `clip${clipNum}`);
-    setClipNum((prev) => prev + 1);
     console.log(blobUrl);
   };
 
@@ -60,16 +61,30 @@ const MainDisplay = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
 
   let timeoutId = null;
   let st = 1;
+  const notifyModel = () => {
+    let currClipNum = clipNum;
+    setClipNum((prev) => prev + 1);
+    axios
+      .post(modelUrl, { name: `clip${currClipNum}` })
+      .then((response) => {
+        console.log("Response:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error.message);
+      });
+  };
+
   const stopSendingRecordings = () => {
     stopRecording();
     console.log("recording stopped!");
     console.log("send is ", send);
-    if (send && st < 10) {
-      clearTimeout(timeoutId);
-      console.log("status: ", st);
-      st += 1;
-      startSendingRecordings();
-    }
+    // notifyModel();
+    // if (send && st < 10) {
+    //   clearTimeout(timeoutId);
+    //   console.log("status: ", st);
+    //   st += 1;
+    //   startSendingRecordings();
+    // }
   };
 
   const startSendingRecordings = () => {

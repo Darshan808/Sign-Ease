@@ -5,16 +5,26 @@ import Send from "../../Assets/send.png";
 import Avatar from "../../Assets/Ellipse 10.png";
 import Mute_Mic from "../../Assets/mute.png";
 import No_Video from "../../Assets/no-video-h.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const InfoBox = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
   const [allChats, setAllChats] = useState(["Hello Everyone!"]);
   const [msg, setMsg] = useState("");
+  const [activeDots, setActiveDots] = useState([]);
   const handleSumbit = (e) => {
     e.preventDefault();
     setAllChats((prev) => [...prev, msg]);
     setMsg("");
   };
+  // if (isMicOn) {
+  //   console.log("mic on");
+  //   for (let i = 0; i < 5; i++) {
+  //     setTimeout(() => {
+  //       console.log(activeDots);
+  //       setActiveDots((prev) => [...prev, "."]);
+  //     }, 1000 * (i + 1));
+  //   }
+  // }
   return (
     <div className="info-content">
       <div className="i-participants r-wrapper">
@@ -25,6 +35,24 @@ const InfoBox = ({ isVideoOn, setIsVideoOn, isMicOn, setIsMicOn }) => {
             <div className="p-iname">
               <img src={Avatar} />
               <span>You</span>
+              <div className="fiveDots">
+                {activeDots.map((dot, index) => {
+                  let leftPush = -14 + 10 * index;
+                  return (
+                    <div
+                      style={{
+                        top: "-52px",
+                        left: `${leftPush}px`,
+                        fontSize: "3.5rem",
+                      }}
+                      className="activeDot"
+                      key={index}
+                    >
+                      {dot}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <div className="i-icons">
               <img src={isMicOn ? Mic : Mute_Mic} />

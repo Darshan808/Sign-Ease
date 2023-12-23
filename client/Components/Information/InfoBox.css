@@ -100,3 +100,14 @@ hr{
     width: 100%;
     color: #393939
 }
+.fiveDots{
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    position: relative;
+}
+.activeDot{
+    position: absolute;
+    display: inline;
+    color: green;
+}
