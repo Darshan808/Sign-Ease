@@ -1,0 +1,7 @@
+mediapipe
+tensorflow 
+opencv-python
+Pillow
+pandas
+numpy
+

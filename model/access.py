@@ -10,7 +10,7 @@ import json
 
 class HandSignRecognizer:
     def __init__(self):
-
+        
         self.mp_holistic = mp.solutions.holistic
         self.ROWS_PER_FRAME = 543
         self.face = pd.DataFrame()
@@ -18,7 +18,7 @@ class HandSignRecognizer:
         
         xyz = pd.read_csv("xyz_df.csv")
         self.xyz_skel = xyz[['type', 'landmark_index']].drop_duplicates().reset_index(drop=True).copy()
-        # Dictionaries to translate sign <-> ordinal encoded sign
+       # Dictionaries to translate sign <-> ordinal encoded sign
         self.prediction_fn = self.pred_fn()
         json_file_path = 'sign_to_prediction_index_map.json'
         # Open the JSON file and load its contents into a Python dictionary
@@ -77,21 +77,24 @@ class HandSignRecognizer:
         pred = prediction['outputs'].argmax()
         sign = self.n2sign[pred]
         return sign, prediction['outputs'][pred]
+        
 
     def pred_fn(self):
         interpreter = tf.lite.Interpreter('model_new.tflite')
+        found_signatures = list(interpreter.get_signature_list())
         prediction_fn = interpreter.get_signature_runner("serving_default")
         return prediction_fn
+        
 
     def capturing_video(self, video_path):
         all_landmarks = []
         cap = cv2.VideoCapture(video_path)
-        
 
 
         with self.mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
             frame = 0
             while cap.isOpened():
+
                 frame += 1
                 success, image = cap.read()
                 if not success:
@@ -110,7 +113,7 @@ class HandSignRecognizer:
                     
                     
                     
-
+        self.face = pd.DataFrame()
         cap.release()
         all_landmarks_df = pd.concat(all_landmarks).reset_index(drop=True)
         return all_landmarks_df
@@ -125,6 +128,7 @@ class HandSignRecognizer:
     def vid_to_eng(self, video_path):
         
         landmarks = self.capturing_video(video_path)
+        
         xyz_npp = self.load_relevant_data_subset(landmarks)
         sign, confidence = self.predict(xyz_npp)
         if confidence > 4:
@@ -132,16 +136,17 @@ class HandSignRecognizer:
         return "", confidence
     
 
-recognizer = HandSignRecognizer()
-video_path = r"tes22.mp4"
 
+recognizer = HandSignRecognizer()
+
+video_path = r"me_demo.mp4"
 start_time = time.time()
 s,a = recognizer.vid_to_eng(video_path)
 print(s)
 print(a)
-end_time = time.time()
-time_take = end_time - start_time
-print(time_take)
+
+
+
 
 
 
