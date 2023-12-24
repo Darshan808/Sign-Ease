@@ -73,3 +73,5 @@ python access.py
 3. Once a green bleep appears next to your username, you can start showing the hand signs.
 4. The shown hand signs will be transcibed as English text on the caption section.
 
+#### For any Queries, Contact the project maintainer: 
+Darshan Poudel, pranishpoudel10@gmail.com
