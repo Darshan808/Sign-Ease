@@ -63,7 +63,7 @@ python access.py
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](https://drive.google.com/file/d/1T_CnQJQ4oYomFBAdMkpg6YkIfK57T5Ta/view?usp=sharing)
 
 
 ## Usage
