@@ -17,7 +17,7 @@ Bridging Communication Through Hand Signs for Enhanced Health and Wellbeing
 
 ## Demo
 
-Insert gif or link to demo
+[Insert gif or link to demo](https://www.youtube.com/watch?v=fTqZ7G2DuFE)
 
 
 ## Installation
