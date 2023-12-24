@@ -1,6 +1,6 @@
 # Sign-Ease
 
-Bridging Communication Through Hand Signs for Enhanced Health and
+Bridging Communication Through Hand Signs for Enhanced Health and Wellbeing
 
 
 
